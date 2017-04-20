@@ -2,7 +2,9 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -40,6 +42,8 @@ public class Home extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
+        search = new javax.swing.JButton();
+        cari = new com.toedter.calendar.JDateChooser();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -74,9 +78,20 @@ public class Home extends javax.swing.JFrame {
 
         jLabel8.setFont(new java.awt.Font("SF Espresso Shack", 1, 36)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel8.setText("rental barokah");
+        jLabel8.setText("Rental Barokah");
         jPanel1.add(jLabel8);
-        jLabel8.setBounds(10, 10, 470, 50);
+        jLabel8.setBounds(10, 0, 470, 50);
+
+        search.setText("Cari");
+        search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchActionPerformed(evt);
+            }
+        });
+        jPanel1.add(search);
+        search.setBounds(500, 10, 60, 30);
+        jPanel1.add(cari);
+        cari.setBounds(570, 10, 180, 30);
 
         getContentPane().add(jPanel1);
         jPanel1.setBounds(0, 0, 770, 70);
@@ -143,7 +158,7 @@ public class Home extends javax.swing.JFrame {
         jPanel2.add(pinjam);
         pinjam.setBounds(10, 340, 190, 30);
         jPanel2.add(jTextField1);
-        jTextField1.setBounds(20, 30, 130, 40);
+        jTextField1.setBounds(10, 40, 190, 30);
 
         getContentPane().add(jPanel2);
         jPanel2.setBounds(0, 70, 210, 520);
@@ -283,6 +298,41 @@ public class Home extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_printActionPerformed
 
+    private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
+        try {
+            search();
+        } catch (ParseException ex) {
+            Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_searchActionPerformed
+
+        public void search() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = dateFormat.format(cari.getDate());
+        String kolom[] = {"Id","Nama","Alamat","No Struk","No Pol","Tgl Pinjam","Tgl Kembali","Harga"};
+        DefaultTableModel dtm = new DefaultTableModel(null, kolom);
+        //SELECT * FROM `rental` WHERE tgl_pinjam <= 101217 AND tgl_kembali >= 101217
+        String SQL = "SELECT * FROM tb_rental WHERE Pinjam <= '"+date+"' AND Kembali >= '"+date+"' ";
+        System.out.println(SQL);
+        ResultSet rs = KoneksiDB.executeQuery(SQL);
+        try{
+            while(rs.next()) {
+                        String Nama = rs.getString(1);
+                        String Alamat = rs.getString(2);
+                        String Struk = rs.getString(3);
+                        String Nopol = rs.getString(4);
+                        String Pinjam = rs.getString(5);
+                        String Kembali = rs.getString(6);
+                        String Harga = rs.getString(7);
+                        String data[] = {Nama,Alamat,Struk,Nopol,Pinjam,Kembali,Harga};
+                        dtm.addRow(data);
+            }
+        } catch (SQLException ex){
+            Logger.getLogger(Home.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        tabel.setModel(dtm);
+    }
+
         private void selectData() {
         String kolom[]={"Nama","Alamat","Struk","Nopol","Pinjam","Kembali","Harga"};
         DefaultTableModel dtm = new DefaultTableModel(null, kolom);
@@ -343,6 +393,7 @@ public class Home extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea alamat;
+    private com.toedter.calendar.JDateChooser cari;
     private javax.swing.JButton clear;
     private javax.swing.JButton delete;
     private javax.swing.JTextField harga;
@@ -366,6 +417,7 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JButton print;
     private javax.swing.JButton refresh;
     private javax.swing.JButton save;
+    private javax.swing.JButton search;
     private javax.swing.JTextField struk;
     private javax.swing.JTable tabel;
     // End of variables declaration//GEN-END:variables
